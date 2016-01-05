@@ -47,9 +47,6 @@ object PingPongTest extends App {
   val service  = Map("service" -> serviceInfo).asJava
   val json  = Map("json" -> service).asJava
 
-  println(json)
-  println(appendEntries(json))
-
   logger.info(appendEntries(json), "log message")
 
   // start them going
