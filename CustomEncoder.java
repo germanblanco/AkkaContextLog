@@ -1,4 +1,7 @@
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.LoggingEvent;
+import net.logstash.logback.marker.LogstashMarker;
+import static net.logstash.logback.marker.Markers.*;
 import java.io.IOException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import ch.qos.logback.core.CoreConstants;
@@ -16,15 +19,11 @@ public class CustomEncoder extends net.logstash.logback.encoder.LogstashEncoder 
 
     @Override
     public void doEncode(ILoggingEvent event) throws IOException {
-        ObjectNode eventNode = MAPPER.createObjectNode();
-        eventNode.put(Singleton.hello, "world");
-        eventNode.put("@message", event.getFormattedMessage());
-        
-        outputStream.write(MAPPER.writeValueAsBytes(eventNode));
-        outputStream.write(CoreConstants.LINE_SEPARATOR.getBytes());
-        
-        if (immediateFlush) {
-            outputStream.flush();
+        LogstashMarker marker = (LogstashMarker)event.getMarker();
+        LoggingEvent ev = (LoggingEvent)event;
+        if (marker != null) {
+            marker.add(append(Singleton.hello, "world"));
         }
+        super.doEncode(ev);
     }
 }
